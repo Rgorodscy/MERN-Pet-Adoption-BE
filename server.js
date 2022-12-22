@@ -14,9 +14,9 @@ app.use(express.json())
 app.use(cors()); //Allows requests from anywhere, eventually it needs to be fixed to accept only from our FE
 
 app.use('/pet', petRoute);
-// app.use('/user', userRoute);
-// app.use('/login', loginRoute);
-// app.use('/signup', signupRoute);
+app.use('/user', userRoute);
+app.use('/login', loginRoute);
+app.use('/signup', signupRoute);
 
 
 app.listen(PORT, () => {
