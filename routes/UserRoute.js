@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { userSchema } = require('../schemas/userSchema');
-const { validateBody } = require('../middleware/userMiddleware'); //Think about the check if the user exists
+const { userUpdateSchema } = require('../schemas/userSchema');
+const { validateBody, confirmUserExists, checkNewEmailNotInUse, hashPassword } = require('../middleware/userMiddleware'); //Think about the check if the user exists
 const { v4: uuidv4 } = require('uuid');
 
 const { readAllUsers, readAllUsersAsync, addUser, updateUser } = require('../models/userModels');
@@ -40,16 +40,19 @@ router.get('/:id', async (req, res) => {
 // phone number
 // bio
 
-router.put('/:id', validateBody(userSchema), async (req, res) => {
-    try {
-      const newUserInfo = req.body;
-      const newAllUsers = await updateUser(req.body);
-      if (newAllUsers) {
-        res.status(200).send(newUserInfo);
-      }
-    } catch (err) {
-      res.status(500).send(err);
-      console.log(err);
+router.put('/:id', validateBody(userUpdateSchema), confirmUserExists, checkNewEmailNotInUse, hashPassword, async (req, res) => {
+    if(req.userExists && !req.emailInUse){
+        try {
+        const encryptedPassword = req.hashedPassword
+        const newUserInfo = req.body.newUserInfo;
+        const newAllUsers = await updateUser(newUserInfo);
+        if (newAllUsers) {
+            res.status(200).send(newUserInfo);
+        }
+        } catch (err) {
+        res.status(500).send(err);
+        console.log(err);
+        }
     }
 }); 
 
@@ -74,7 +77,7 @@ router.get('/:id/full', async (req, res) => {
         const id = req.params.id;
         const users = readAllUsers();
         const foundUser = await users.find(user => user.id === id);
-        stringifiedFoundUser = JSON.stringify(foundUser)
+        stringifiedFoundUser = JSON.stringify(foundUser);
         res.status(200).send(stringifiedFoundUser);
         return
     }catch(err){

@@ -1,21 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { loginSchema } = require('../schemas/userSchema');
-const { validateBody, confirmUserExists } = require('../middleware/userMiddleware'); //Think about the check if the user exists
-const { v4: uuidv4 } = require('uuid');
+const { validateBody, confirmUserExists } = require('../middleware/userMiddleware');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const myPlaintextPassword = 's0/\/\P4$$w0rD';
-const someOtherPlaintextPassword = 'not_bacon';
 
 const { readAllUsers, readAllUsersAsync } = require('../models/userModels');
-
-const decryptPassword = (password, hash) => {
-    return bcrypt.compare(password, hash, function(err, result) {
-    return result
-});
-}
-
 
 // Login API
 // route: ‘/login’ [POST]
@@ -45,6 +34,9 @@ router.post('/', validateBody(loginSchema), confirmUserExists, async (req, res) 
           const matched = await bcrypt.compare(req.body.password, foundUser.password);
           if (matched) {
             res.status(200).send(resBody);
+          }
+          if(!matched){
+            res.status(400).send("Wrong Password")
           }
         } catch (err) {
           res.status(500).send(err);

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { signupSchema } = require('../schemas/userSchema');
-const { validateBody, confirmUserExists, checkPasswordsMatch } = require('../middleware/userMiddleware'); //Think about the check if the user exists
+const { validateBody, confirmUserExists, checkPasswordsMatch, hashPassword } = require('../middleware/userMiddleware'); //Think about the check if the user exists
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -26,20 +26,25 @@ const { readAllUsers, readAllUsersAsync, addUser } = require('../models/userMode
 // First and last name
 // Phone number
 
-router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMatch,  async (req, res) => {
+router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMatch, hashPassword,   async (req, res) => {
     if(!req.userExists){
         try {
             const userProps = req.body;
-          const encryptedPassword = await bcrypt.hash(req.body.password, saltRounds);
+          const encryptedPassword = req.hashedPassword
           const newUser = {
             ...userProps,
             password: encryptedPassword,
             confirmPassword: encryptedPassword,
             id: uuidv4(),
           };
+          const resBody = {
+            ...newUser,
+            password: req.body.password,
+            confirmPassword: req.body.password,
+          }
           const addedUser = addUser(newUser);
           if (addedUser) {
-            res.status(200).send(newUser);
+            res.status(200).send(resBody);
           }
         } catch (err) {
           res.status(500).send(err);
