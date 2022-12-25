@@ -3,28 +3,13 @@ const router = express.Router();
 const { petSchema } = require('../schemas/petSchema');
 const { validateBody } = require('../middleware/petMiddleware'); //Think about the check if the pet exists
 const { v4: uuidv4 } = require('uuid');
-
-const { readAllPetsAsync, addPet, readAllPets, updatePet } = require('../models/petModels');
+const Pet = require('../mongooseSchemas/petMongooseSchema');
+const petControllers = require('../controllers/petControllers')
 
 // ADD PET API
 // Route: ‘/pet’ [POST] (Protected to admin only)
 // TODO: Handle photo upload, Admin Protection
-router.post('/', validateBody(petSchema), (req, res) => {
-    try {
-      const petProps = req.body;
-      const newPet = {
-        ...petProps,
-        id: uuidv4(),
-      };
-      const addedPet = addPet(newPet);
-      if (addedPet) {
-        res.status(200).send(newPet);
-      }
-    } catch (err) {
-      res.status(500).send(err);
-      console.log(err);
-    }
-});
+router.post('/', validateBody(petSchema), petControllers.createPet);
 
 
 // GET PETS API
@@ -39,45 +24,19 @@ router.post('/', validateBody(petSchema), (req, res) => {
 // Height
 // Weight
 // Name
-router.get('/', async (req, res) => {
-    const pets = readAllPets();
-    res.send(pets);
-});
+router.get('/', petControllers.findAllPets);
 
 
 // GET PET BY ID API
 // Route: ‘/pet/:id’ [GET]
 // Get a pet by ID should take an id and return the corresponding pet from the database. 
-router.get('/:id', async (req, res) => {
-    try{
-        const id = req.params.id;
-        const pets = readAllPets();
-        const foundPet = await pets.find(pet => pet.id === id);
-        stringifiedFoundPet = JSON.stringify(foundPet)
-        res.status(200).send(stringifiedFoundPet);
-        return
-    }catch(err){
-        console.log(err);
-        res.status(500).send(err)
-    }
-});
+router.get('/:id', petControllers.findPetById);
   
 // EDIT PET API
 // Route: ‘/pet/:id’ [PUT] (protected to admin only)
 // Handle photo upload
 
-router.put('/:id', validateBody(petSchema), async (req, res) => {
-    try {
-      const newPetInfo = req.body;
-      const newAllPets = await updatePet(req.body);
-      if (newAllPets) {
-        res.status(200).send(newPetInfo);
-      }
-    } catch (err) {
-      res.status(500).send(err);
-      console.log(err);
-    }
-}); 
+router.put('/:id', validateBody(petSchema), petControllers.updatePetById); 
   
 
 // Adopt/Foster API

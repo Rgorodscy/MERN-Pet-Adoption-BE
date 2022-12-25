@@ -1,31 +1,35 @@
-const fs = require('fs');
-const path = require('path');
-const pathToUsersDb = path.resolve(__dirname, '../db/usersDataSet.json');
+const User = require('../mongooseSchemas/userMongooseSchema');
 
-
-function readAllUsers() {
-  const allUsers = fs.readFileSync(pathToUsersDb);
-  if(allUsers) {
-      return JSON.parse(allUsers);
+async function readAllUsers() {
+  try{
+    const allUsers = await User.find({});
+    return allUsers;
+  }catch(err){
+    console.log(err)
   }
 }
 
-function readAllUsersAsync() {
-   return fs.readFile(pathToUsersDb, 'utf8', (err, data) => {
-      if (err) {
-        return err;
-      } else {
-        return JSON.parse(data);
-      }
-    });
-  }
+async function readUserById(userId) {
+  try{
+    const user = await User.find({ id: userId });
+    return user
+  }catch(err){
+    console.log(err)
+  } 
+}
 
-function addUser(newUser) {
+async function readUserByKey(key, value) {
+  try{
+    const user = await User.find({ [key]: value });
+    return user
+  }catch(err){
+    console.log(err)
+  } 
+}
+async function addUser(newUser) {
   try {
-    const allUsers = readAllUsers();
-    allUsers.push(newUser);
-    fs.writeFileSync(pathToUsersDb, JSON.stringify(allUsers));
-    return allUsers;
+    const addedUser = await User.create(newUser);
+    return addedUser;
   } catch (err) {
     console.log(err);
   }
@@ -33,15 +37,12 @@ function addUser(newUser) {
 
 async function updateUser(newUserInfo) {
   try {
-    const allUsers = await readAllUsers();
-    const userId = newUserInfo.id
-    const newAllUsers = await allUsers.filter(user => user.id !== userId);
-    newAllUsers.push(newUserInfo);
-    fs.writeFileSync(pathToUsersDb, JSON.stringify(newAllUsers));
-    return newAllUsers;
+    const userId = newUserInfo.id;
+    const updateRes = await User.updateOne({id: userId}, {...newUserInfo})
+    return updateRes
   } catch (err) {
     console.log(err);
   }
 }
 
-module.exports = { readAllUsers, readAllUsersAsync, addUser, updateUser };
+module.exports = { readAllUsers, readUserById, addUser, updateUser, readUserByKey };

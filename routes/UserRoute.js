@@ -3,27 +3,13 @@ const router = express.Router();
 const { userUpdateSchema } = require('../schemas/userSchema');
 const { validateBody, confirmUserExists, checkNewEmailNotInUse, hashPassword } = require('../middleware/userMiddleware'); //Think about the check if the user exists
 const { v4: uuidv4 } = require('uuid');
-
-const { readAllUsers, readAllUsersAsync, addUser, updateUser } = require('../models/userModels');
-
+const userControllers = require('../controllers/userControllers')
 
 // Get User By ID API
 // Route ‘/user/:id’ [GET]
 // This api allows you to get a user based on the user's id. 
 
-router.get('/:id', async (req, res) => {
-    try{
-        const id = req.params.id;
-        const users = readAllUsers();
-        const foundUser = await users.find(user => user.id === id);
-        stringifiedFoundUser = JSON.stringify(foundUser)
-        res.status(200).send(stringifiedFoundUser);
-        return
-    }catch(err){
-        console.log(err);
-        res.status(500).send(err)
-    }
-});
+router.get('/:id', userControllers.findUserById);
 
 
 // Update User API
@@ -40,21 +26,7 @@ router.get('/:id', async (req, res) => {
 // phone number
 // bio
 
-router.put('/:id', validateBody(userUpdateSchema), confirmUserExists, checkNewEmailNotInUse, hashPassword, async (req, res) => {
-    if(req.userExists && !req.emailInUse){
-        try {
-        const encryptedPassword = req.hashedPassword
-        const newUserInfo = req.body.newUserInfo;
-        const newAllUsers = await updateUser(newUserInfo);
-        if (newAllUsers) {
-            res.status(200).send(newUserInfo);
-        }
-        } catch (err) {
-        res.status(500).send(err);
-        console.log(err);
-        }
-    }
-}); 
+router.put('/:id', validateBody(userUpdateSchema), confirmUserExists, checkNewEmailNotInUse,   hashPassword, userControllers.updatePetById); 
 
 
 // Get Users API
@@ -62,28 +34,13 @@ router.put('/:id', validateBody(userUpdateSchema), confirmUserExists, checkNewEm
 // The GET users API returns all users in the DB.
 // The API should only return the information required
 
-router.get('/', async (req, res) => {
-    const users = readAllUsers();
-    res.send(users);
-});
+router.get('/', userControllers.findAllUsers);
 
 // Get User By ID API
 // Route ‘/user/:id/full’ [GET]
 // This api allows you to get a user based on the user's id. 
 // The API should return all the user details (aside from password) and the users pets they own.
 
-router.get('/:id/full', async (req, res) => {
-    try{
-        const id = req.params.id;
-        const users = readAllUsers();
-        const foundUser = await users.find(user => user.id === id);
-        stringifiedFoundUser = JSON.stringify(foundUser);
-        res.status(200).send(stringifiedFoundUser);
-        return
-    }catch(err){
-        console.log(err);
-        res.status(500).send(err)
-    }
-});
+router.get('/:id/full', userControllers.findUserById);
 
 module.exports = router;

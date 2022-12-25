@@ -1,28 +1,27 @@
-const fs = require('fs');
-const path = require('path');
-const pathToPetsDb = path.resolve(__dirname, '../db/PetsDataSet.json');
+const Pet = require('../mongooseSchemas/petMongooseSchema');
 
-function readAllPets() {
-  const allPets = fs.readFileSync(pathToPetsDb);
-  return JSON.parse(allPets);
+async function readAllPets() { //Still needs to accept the query paramethers or create a new model to handle searches
+  try{
+    const allPets = await Pet.find({});
+    return allPets
+  }catch(err){
+    console.log(err)
+  }
 }
 
-function readAllPetsAsync() {
-   return fs.readFile(pathToPetsDb, 'utf8', (err, data) => {
-      if (err) {
-        return err;
-      } else {
-        return JSON.parse(data);
-      }
-    });
-  }
+async function readPetById(petId) {
+  try{
+    const pet = await Pet.find({ id: petId });
+    return pet
+  }catch(err){
+    console.log(err)
+  } 
+}
 
-function addPet(newPet) {
+async function addPet(newPet) {
   try {
-    const allPets = readAllPets();
-    allPets.push(newPet);
-    fs.writeFileSync(pathToPetsDb, JSON.stringify(allPets));
-    return allPets;
+    const addedPet = await Pet.create(newPet);
+    return addedPet;
   } catch (err) {
     console.log(err);
   }
@@ -30,15 +29,12 @@ function addPet(newPet) {
 
 async function updatePet(newPetInfo) {
   try {
-    const allPets = await readAllPets();
-    const petId = newPetInfo.id
-    const newAllPets = await allPets.filter(pet => pet.id !== petId);
-    newAllPets.push(newPetInfo);
-    fs.writeFileSync(pathToPetsDb, JSON.stringify(newAllPets));
-    return newAllPets;
+    const petId = newPetInfo.id;
+    const updateRes = await Pet.updateOne({id: petId}, {...newPetInfo})
+    return updateRes;
   } catch (err) {
     console.log(err);
   }
 }
 
-module.exports = { readAllPets, readAllPetsAsync, addPet, updatePet };
+module.exports = { readAllPets, readPetById, addPet, updatePet };

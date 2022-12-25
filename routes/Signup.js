@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 
-const { readAllUsers, readAllUsersAsync, addUser } = require('../models/userModels');
+const { addUser } = require('../models/userModels');
 
 
 
@@ -26,7 +26,7 @@ const { readAllUsers, readAllUsersAsync, addUser } = require('../models/userMode
 // First and last name
 // Phone number
 
-router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMatch, hashPassword,   async (req, res) => {
+router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMatch, hashPassword, async (req, res) => {
     if(!req.userExists){
         try {
             const userProps = req.body;

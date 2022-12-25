@@ -1,37 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const { loginSchema } = require('../schemas/userSchema');
-const { validateBody, confirmUserExists } = require('../middleware/userMiddleware');
+const { validateBody, confirmUserExists, hashPassword } = require('../middleware/userMiddleware');
 const bcrypt = require('bcrypt');
 
-const { readAllUsers, readAllUsersAsync } = require('../models/userModels');
+const { readUserByKey } = require('../models/userModels');
 
 // Login API
 // route: ‘/login’ [POST]
-// The login api is responsible for logging in existing users
-// Validate all the user input is valid
-// Check the email and password match an existing user
 // Retrieve the users data from the database and login the user.
+// Change the res.body to token
 
-// Fields: 
-// Email address 
-// Password
-
-router.post('/', validateBody(loginSchema), confirmUserExists, async (req, res) => {
+router.post('/', validateBody(loginSchema), confirmUserExists, hashPassword, async (req, res) => {
     if(req.userExists){
         try {
-          const allUsers = await readAllUsers();
           const userEmail = req.body.email;
-          const foundUser = allUsers.find(user => user.email === userEmail);
-          if(!foundUser){
+          const foundUser = await readUserByKey("email", userEmail);
+          if(!foundUser[0]){
             res.status(400).send("User not found")
           }
           const resBody = {
-            ...foundUser,
+            ...foundUser[0]._doc,
             password: req.body.password,
             confirmPassword: req.body.password
           }
-          const matched = await bcrypt.compare(req.body.password, foundUser.password);
+          const matched = bcrypt.compare(req.body.password, foundUser[0].password);
           if (matched) {
             res.status(200).send(resBody);
           }
