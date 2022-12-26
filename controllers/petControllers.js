@@ -21,7 +21,8 @@ const createPet = async (req, res) => {
 
 const findAllPets =  async (req, res) => {
     try{
-      const pets = await readAllPets();
+      queryParams = req.query;
+      const pets = await readAllPets(queryParams);
       res.send(pets);
     }catch(err){
       console.log(err);

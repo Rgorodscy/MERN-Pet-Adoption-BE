@@ -1,8 +1,8 @@
 const Pet = require('../mongooseSchemas/petMongooseSchema');
 
-async function readAllPets() { //Still needs to accept the query paramethers or create a new model to handle searches
+async function readAllPets(queryParams) { //Still needs to accept the query paramethers or create a new model to handle searches
   try{
-    const allPets = await Pet.find({});
+    const allPets = await Pet.find(queryParams);
     return allPets
   }catch(err){
     console.log(err)

@@ -14,16 +14,6 @@ router.post('/', validateBody(petSchema), petControllers.createPet);
 
 // GET PETS API
 // Route: ‘/pet’ [GET] 
-// The get pets API is responsible for retrieving pets that match the criteria given.
-// Can receive query parameters to search the database
-// Retrieve results to match query. If no parameters are passed it should return all the results.
-// Should only return the fields necessary 
-// Search Fields: 
-// Adoption Status
-// Type
-// Height
-// Weight
-// Name
 router.get('/', petControllers.findAllPets);
 
 
