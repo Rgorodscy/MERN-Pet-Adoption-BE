@@ -11,7 +11,7 @@ async function readAllUsers() {
 
 async function readUserById(userId) {
   try{
-    const user = await User.find({ id: userId });
+    const user = await User.find({ id: userId }).lean();
     return user
   }catch(err){
     console.log(err)

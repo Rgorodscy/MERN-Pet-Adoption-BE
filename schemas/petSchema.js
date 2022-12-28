@@ -12,7 +12,10 @@ const petSchema = {
       hypoallergenic: { type: 'boolean' },
       dietary: { type: 'string' },
       breed: { type: 'string' },
-      id: { type: 'string' }
+      id: { type: 'string' },
+      _id: { type: 'string' },
+      __v:  { type: 'number' },
+      userId: { type: 'string' }
     },
     required: ["type", "name", "adoptionStatus", "image", "height", "weight", "color", "bio", "hypoallergenic", "dietary", "breed"],
     additionalProperties: false,

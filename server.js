@@ -1,16 +1,16 @@
 const express = require('express');
-const cors = require('cors')
+const cors = require('cors');
+require('dotenv').config();
 const app = express();
 const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.PORT || 8080;
 const mongoose = require('mongoose');
-const {petSchema} = require('./schemas/petSchema')
-
-main().catch(err => console.log(err));
+const {petSchema} = require('./schemas/petSchema');
 
 async function main() {
-  await mongoose.connect('mongodb+srv://mongodbpet:mongodbpet@cluster0.ckuwaxt.mongodb.net/pet-adoption-app');
+  await mongoose.connect(process.env.DB_URL);
 }
+main().catch(err => console.log(err));
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error: "));
@@ -18,9 +18,8 @@ db.once("open", function () {
   console.log("Connected to DB successfully");
   app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`)
-})
+  })
 });
-
 
 const userRoute = require('./routes/UserRoute')
 const petRoute = require('./routes/PetRoute')

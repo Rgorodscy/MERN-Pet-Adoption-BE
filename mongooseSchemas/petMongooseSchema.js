@@ -14,7 +14,10 @@ const petMongooseSchema = new Schema ({
       hypoallergenic: { type: 'boolean' },
       dietary: { type: 'string' },
       breed: { type: 'string' },
-      id: { type: 'string' }
+      id: { type: 'string' },
+      _id: { type: 'string' },
+      __v:  { type: 'number' },
+      userId: { type: 'string' }
 
 });
 

@@ -10,6 +10,8 @@ const userMongooseSchema = new Schema ({
       confirmPassword: { type: 'string' },
       id: { type: 'string', required: false },
       bio:  { type: 'string', required: false },
+      savedPets: { type: 'array' },
+      myPets:  { type: 'array' }
 });
 
 module.exports = mongoose.model('User', userMongooseSchema)

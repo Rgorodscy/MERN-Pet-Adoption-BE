@@ -33,6 +33,8 @@ const userUpdateSchema = {
         confirmPassword: { type: 'string' },
         id:  { type: 'string' },
         bio: { type: 'string' },
+        savedPets: { type: 'array' },
+        myPets:  { type: 'array' }
       },
       required: ["email", "firstName", "lastName", "phone", "password", "confirmPassword", "id"],
       additionalProperties: false,

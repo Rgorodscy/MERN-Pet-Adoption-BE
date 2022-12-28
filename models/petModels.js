@@ -11,7 +11,7 @@ async function readAllPets(queryParams) { //Still needs to accept the query para
 
 async function readPetById(petId) {
   try{
-    const pet = await Pet.find({ id: petId });
+    const pet = await Pet.find({ id: petId }).lean();
     return pet
   }catch(err){
     console.log(err)
