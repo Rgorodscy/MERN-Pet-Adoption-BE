@@ -39,27 +39,15 @@ router.post('/:id/adopt', checkPetAvailable, petControllers.adoptFosterPet);
 // Return Pet API
 // Route ‘/pet/:id/return’ [POST] (protected to logged in users)
 // The Return Pet API is responsible for returning the pet to the agency. 
-// The API should change the pets status back to available
-// The API should remove the pet from the users pets.
 router.post('/:id/return', checkPetNotAvailable, petControllers.returnPet)
 
 // Save Pet API
 // Route ‘/pet/:id/save’ [POST] (protected to logged in users)
-// The save PET api allows a user to save a pet for later
-// The saved pet should be stored as saved in the users account
-router.post('/:id/save', async (req, res) => {
-    //search pet object, put it on savedPets in user object
-    res.send('Hi');
-});
-
-
+router.post('/:id/save', petControllers.savePet);
 
 // Delete Saved Pet API
 // Route ‘/pet/:id/save’ [DELETE] (protected to logged in users)
-// The save PET api allows a user to remove a saved pet.
-router.delete('/:id/save', async (req, res) => {
-    res.send('Hi');
-});
+router.delete('/:id/save', petControllers.deletePet);
   
 // Get Pets By User ID API
 // Route ‘/pet/user/:id’ [GET]

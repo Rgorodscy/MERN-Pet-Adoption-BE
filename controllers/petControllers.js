@@ -17,8 +17,8 @@ const createPet = async (req, res) => {
       } catch (err) {
         res.status(500).send(err);
         console.log(err);
-      }
-}
+      };
+};
 
 const findAllPets =  async (req, res) => {
     try{
@@ -28,8 +28,8 @@ const findAllPets =  async (req, res) => {
     }catch(err){
       console.log(err);
       res.status(500).send(err)
-  }
-}
+  };
+};
 
 const findPetById = async (req, res) => {
     try{
@@ -41,8 +41,8 @@ const findPetById = async (req, res) => {
     }catch(err){
         console.log(err);
         res.status(500).send(err)
-    }
-}
+    };
+};
 
 const updatePetById = async (req, res) => {
     try {
@@ -54,8 +54,8 @@ const updatePetById = async (req, res) => {
     } catch (err) {
       res.status(500).send(err);
       console.log(err);
-    }
-}
+    };
+};
 
 const adoptFosterPet = async (req, res) => {
   const adoptType = req.body.type;
@@ -70,20 +70,21 @@ const adoptFosterPet = async (req, res) => {
       ...oldPetInfo,
       adoptionStatus: newPetAdoptionStatuts,
       userId: userId,
-  }
+  };
   const petUpdateRes = await updatePet(newPetInfo);
   if(petUpdateRes){
       const oldUserInfoArray = await readUserById(userId);
       const oldUserInfo = oldUserInfoArray[0];
+      const filteredPetsArray = oldUserInfo.myPets.filter((pet) => pet.id !== petId);
       const newUserInfo = {
-          ...oldUserInfo,
-          myPets: [...oldUserInfo.myPets, newPetInfo]
-      }
+        ...oldUserInfo,
+        myPets: [...filteredPetsArray, newPetInfo]
+      };
       const userUpdateRes = await updateUser(newUserInfo);
       if(!userUpdateRes){
-          res.status(400).send("Error updating user");
-          return;
-      }
+        res.status(400).send("Error updating user");
+        return;
+      };
   }
   if(!petUpdateRes){
       res.status(400).send("Error updating pet");
@@ -97,24 +98,24 @@ const returnPet = async (req, res) => {
   const petId = req.params.id;
   const oldPetInfoArray = await readPetById(petId);
   const oldPetInfo = oldPetInfoArray[0];  
-  delete oldPetInfo.userId
+  delete oldPetInfo.userId;
   const newPetInfo = {
     ...oldPetInfo,
     adoptionStatus: "Available",
-  }
+  };
   const petUpdateRes = await updatePet(newPetInfo);
   if(petUpdateRes){
     const oldUserInfoArray = await readUserById(userId);
     const oldUserInfo = oldUserInfoArray[0];
-    const filteredPetsArray = oldUserInfo.myPets.filter((pet) => pet.id !== petId)
+    const filteredPetsArray = oldUserInfo.myPets.filter((pet) => pet.id !== petId);
     const newUserInfo = {
-        ...oldUserInfo,
-        myPets: filteredPetsArray
-    }
+      ...oldUserInfo,
+      myPets: filteredPetsArray
+    };
     const userUpdateRes = await updateUser(newUserInfo);
     if(!userUpdateRes){
-        res.status(400).send("Error updating user");
-        return;
+      res.status(400).send("Error updating user");
+      return;
     }
   }
   if(!petUpdateRes){
@@ -124,4 +125,46 @@ const returnPet = async (req, res) => {
 res.status(200).send(newPetInfo);
 }
 
-module.exports = {createPet, findAllPets, findPetById, updatePetById, adoptFosterPet, returnPet}
+const savePet = async (req, res) => {
+  const userId = req.body.userId;
+  const petId = req.params.id;
+  const petInfoArray = await readPetById(petId);
+  const petInfo = petInfoArray[0];
+
+  if(petInfo){
+    const oldUserInfoArray = await readUserById(userId);
+    const oldUserInfo = oldUserInfoArray[0];
+    const filteredPetsArray = oldUserInfo.savedPets.filter((pet) => pet.id !== petId);
+    const newUserInfo = {
+      ...oldUserInfo,
+      savedPets: [...filteredPetsArray, petInfo]
+    };
+    const userUpdateRes = await updateUser(newUserInfo);
+    if(!userUpdateRes){
+      res.status(400).send("Error updating user");
+      return;
+    }
+  }
+  res.status(200).send(petInfo);
+}
+
+const deletePet = async (req, res) => {
+  const userId = req.body.userId;
+  const petId = req.params.id;
+  const oldUserInfoArray = await readUserById(userId);
+  const oldUserInfo = oldUserInfoArray[0];
+  const filteredPetsArray = oldUserInfo.savedPets.filter((pet) => pet.id !== petId);
+
+  const newUserInfo = {
+    ...oldUserInfo,
+    savedPets: filteredPetsArray
+  };
+  const userUpdateRes = await updateUser(newUserInfo);
+  if(!userUpdateRes){
+      res.status(400).send("Error updating user");
+      return;
+  }
+  res.status(200).send(userUpdateRes);
+}
+
+module.exports = {createPet, findAllPets, findPetById, updatePetById, adoptFosterPet, returnPet, savePet, deletePet}

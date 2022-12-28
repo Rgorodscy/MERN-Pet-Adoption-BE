@@ -36,6 +36,8 @@ router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMa
             password: encryptedPassword,
             confirmPassword: encryptedPassword,
             id: uuidv4(),
+            myPets: [],
+            savedPets: []
           };
           const resBody = {
             ...newUser,
