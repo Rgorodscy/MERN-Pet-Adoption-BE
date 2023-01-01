@@ -3,7 +3,7 @@ const ajv = new Ajv();
 const { readUserByKey, readUserById } = require('../models/userModels');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-
+const jwt = require('jsonwebtoken')
 
  function validateBody(schema) {
   return (req, res, next) => {
@@ -51,8 +51,37 @@ async function checkPasswordsMatch(req, res, next) {
 async function hashPassword(req, res, next){
   const plainPassword = req.body.password;
   const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
-  req.hashedPassword = hashedPassword;
+  req.body.password = hashedPassword;
+  req.body.confirmPassword = hashedPassword;
   next()
 }
 
-module.exports = { validateBody, confirmUserExists, checkNewEmailNotInUse, checkPasswordsMatch, hashPassword  };
+const auth = (req, res, next) => {
+  if (!req.headers.authorization) {
+    res.status(401).send('Authorization headers required');
+    return;
+  }
+  const token = req.headers.authorization.replace('Bearer ', '');
+  jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      res.status(401).send('Unauthorized');
+      return;
+    }
+
+    if (decoded) {
+      req.userId = decoded.id;
+      req.isAdmin = decoded.isAdmin;
+      next();
+    }
+  });
+};
+
+const checkAdmin = async (req, res, next) => {
+  if(req.isAdmin !== true){
+    res.status(401).send('Unauthorized, user is not Admin');
+    return;
+  };
+  next();
+}
+
+module.exports = { validateBody, confirmUserExists, checkNewEmailNotInUse, checkPasswordsMatch, hashPassword, auth, checkAdmin  };

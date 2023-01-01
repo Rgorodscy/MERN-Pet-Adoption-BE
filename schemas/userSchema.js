@@ -9,7 +9,8 @@ const signupSchema = {
       confirmPassword: { type: 'string' },
       bio: { type: 'string' },
       savedPets: { type: 'array' },
-      myPets:  { type: 'array' }
+      myPets:  { type: 'array' },
+      isAdmin: { type: 'string' }
     },
     required: ["email", "firstName", "lastName", "phone", "password", "confirmPassword"],
     additionalProperties: false,
@@ -37,7 +38,8 @@ const userUpdateSchema = {
         id:  { type: 'string' },
         bio: { type: 'string' },
         savedPets: { type: 'array' },
-        myPets:  { type: 'array' }
+        myPets:  { type: 'array' },
+        isAdmin: { type: 'string' }
       },
       required: ["email", "firstName", "lastName", "phone", "password", "confirmPassword", "id"],
       additionalProperties: false,

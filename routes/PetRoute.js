@@ -7,11 +7,12 @@ const Pet = require('../mongooseSchemas/petMongooseSchema');
 const petControllers = require('../controllers/petControllers');
 const { readUserById, updateUser } = require('../models/userModels');
 const { readPetById, addPet, readAllPets, updatePet } = require('../models/petModels');
+const { auth, checkAdmin } = require('../middleware/userMiddleware')
 
 // ADD PET API
 // Route: ‘/pet’ [POST] (Protected to admin only)
 // TODO: Handle photo upload, Admin Protection
-router.post('/', validateBody(petSchema), petControllers.createPet);
+router.post('/', auth, checkAdmin, validateBody(petSchema), petControllers.createPet);
 
 
 // GET PETS API
@@ -28,33 +29,31 @@ router.get('/:id', petControllers.findPetById);
 // Route: ‘/pet/:id’ [PUT] (protected to admin only)
 // Handle photo upload
 
-router.put('/:id', validateBody(petSchema), petControllers.updatePetById); 
+router.put('/:id', auth, checkAdmin,  validateBody(petSchema), petControllers.updatePetById); 
   
 
 // Adopt/Foster API
 // Route ‘/pet/:id/adopt’ [POST] (protected to logged in users)
 //TODO: protect the same user from adopting/fostering more than once
-router.post('/:id/adopt', checkPetAvailable, petControllers.adoptFosterPet);
+router.post('/:id/adopt', auth,  checkPetAvailable, petControllers.adoptFosterPet);
 
 // Return Pet API
 // Route ‘/pet/:id/return’ [POST] (protected to logged in users)
 // The Return Pet API is responsible for returning the pet to the agency. 
-router.post('/:id/return', checkPetNotAvailable, petControllers.returnPet)
+router.post('/:id/return', auth,  checkPetNotAvailable, petControllers.returnPet)
 
 // Save Pet API
 // Route ‘/pet/:id/save’ [POST] (protected to logged in users)
-router.post('/:id/save', petControllers.savePet);
+router.post('/:id/save', auth,  petControllers.savePet);
 
 // Delete Saved Pet API
 // Route ‘/pet/:id/save’ [DELETE] (protected to logged in users)
-router.delete('/:id/save', petControllers.deletePet);
+router.delete('/:id/save', auth,  petControllers.deletePet);
   
 // Get Pets By User ID API
 // Route ‘/pet/user/:id’ [GET]
 // This api allows a user to get the pets owned by (or saved) by a user based on the user id.
-router.get('/user/:id', async (req, res) => {
-    res.send('Hi');
-});
+router.get('/user/:id', petControllers.getUserPets);
 
 
 module.exports = router;

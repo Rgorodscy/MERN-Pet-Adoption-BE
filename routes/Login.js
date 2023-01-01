@@ -3,7 +3,8 @@ const router = express.Router();
 const { loginSchema } = require('../schemas/userSchema');
 const { validateBody, confirmUserExists, hashPassword } = require('../middleware/userMiddleware');
 const bcrypt = require('bcrypt');
-
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 const { readUserByKey } = require('../models/userModels');
 
 // Login API
@@ -19,14 +20,13 @@ router.post('/', validateBody(loginSchema), confirmUserExists, hashPassword, asy
           if(!foundUser[0]){
             res.status(400).send("User not found")
           }
-          const resBody = {
-            ...foundUser[0]._doc,
-            password: req.body.password,
-            confirmPassword: req.body.password
-          }
+          const resBody = foundUser[0]._doc;
           const matched = bcrypt.compare(req.body.password, foundUser[0].password);
           if (matched) {
-            res.status(200).send(resBody);
+            delete resBody.password;
+            delete resBody.confirmPassword;
+            const token = jwt.sign({id: foundUser[0].id, isAdmin: foundUser[0].isAdmin}, process.env.TOKEN_SECRET, {expiresIn: '1h'});
+            res.status(200).send({token: token, userData: foundUser[0]});
           }
           if(!matched){
             res.status(400).send("Wrong Password")

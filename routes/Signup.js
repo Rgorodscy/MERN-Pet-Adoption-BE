@@ -30,11 +30,8 @@ router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMa
     if(!req.userExists){
         try {
             const userProps = req.body;
-          const encryptedPassword = req.hashedPassword
           const newUser = {
             ...userProps,
-            password: encryptedPassword,
-            confirmPassword: encryptedPassword,
             id: uuidv4(),
             myPets: [],
             savedPets: []
