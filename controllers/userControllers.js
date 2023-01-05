@@ -14,7 +14,12 @@ const findAllUsers = async (req, res) => {
 const findUserById = async (req, res) => {
     try{
         const userId = req.params.id;
-        const userResponse = await readUserById(userId);
+        const foundUser = await readUserById(userId);
+        const userResponse = {
+            ...foundUser[0],
+            password: "",
+            confirmPassword: "",
+        }
         res.status(200).send(userResponse);
         return
     }catch(err){
@@ -23,19 +28,20 @@ const findUserById = async (req, res) => {
     }
 }
 
-const updatePetById = async (req, res) => {
+const updateUserById = async (req, res) => {
     if(req.userExists && !req.emailInUse){
         try {
-        const encryptedPassword = req.hashedPassword
-        const newUserInfo = {
-            ...req.body,
-            password: encryptedPassword,
-            confirmPassword: encryptedPassword,
-        }
-        const updatedUser = await updateUser(newUserInfo);
-        if (updatedUser) {
-            res.status(200).send(updatedUser);
-        }
+            const newUserInfo = {
+                ...req.body
+            }
+            if(req.body.password === '') {
+                delete newUserInfo.password;
+                delete newUserInfo.confirmPassword
+            }
+            const updatedUser = await updateUser(newUserInfo);
+            if (updatedUser) {
+                res.status(200).send(updatedUser);
+            }
         } catch (err) {
         res.status(500).send(err);
         console.log(err);
@@ -43,4 +49,4 @@ const updatePetById = async (req, res) => {
     }
 }
 
-module.exports = {findAllUsers, findUserById, updatePetById}
+module.exports = {findAllUsers, findUserById, updateUserById}

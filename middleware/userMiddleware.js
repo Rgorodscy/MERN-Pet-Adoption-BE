@@ -49,6 +49,9 @@ async function checkPasswordsMatch(req, res, next) {
 }
 
 async function hashPassword(req, res, next){
+  if(req.method === 'PUT' && req.body.password === ''){
+    next();
+  };
   const plainPassword = req.body.password;
   const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
   req.body.password = hashedPassword;

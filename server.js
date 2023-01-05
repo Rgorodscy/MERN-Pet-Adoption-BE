@@ -1,11 +1,27 @@
 const express = require('express');
 const cors = require('cors');
+const  cookieParser = require('cookie-parser');
 require('dotenv').config();
 const app = express();
-const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.PORT || 8080;
 const mongoose = require('mongoose');
-const {petSchema} = require('./schemas/petSchema');
+
+
+const userRoute = require('./routes/UserRoute')
+const petRoute = require('./routes/PetRoute')
+const loginRoute = require('./routes/Login')
+const signupRoute = require('./routes/Signup')
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({ origin: ['http://localhost:3000'], credentials: true })); //Allows requests from anywhere, eventually it needs to be fixed to accept only from our FE
+
+app.use('/pet', petRoute);
+app.use('/user', userRoute);
+app.use('/login', loginRoute);
+app.use('/signup', signupRoute);
+
+
 
 async function main() {
   await mongoose.connect(process.env.DB_URL);
@@ -20,18 +36,3 @@ db.once("open", function () {
     console.log(`Server is listening on port ${PORT}`)
   })
 });
-
-const userRoute = require('./routes/UserRoute')
-const petRoute = require('./routes/PetRoute')
-const loginRoute = require('./routes/Login')
-const signupRoute = require('./routes/Signup')
-
-app.use(express.json())
-app.use(cors()); //Allows requests from anywhere, eventually it needs to be fixed to accept only from our FE
-
-app.use('/pet', petRoute);
-app.use('/user', userRoute);
-app.use('/login', loginRoute);
-app.use('/signup', signupRoute);
-
-

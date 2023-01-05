@@ -13,7 +13,7 @@ router.get('/:id', userControllers.findUserById);
 
 // Update User API
 // Route ‘/user/:id’ [PUT] (protected to logged in user)
-router.put('/:id', auth,  validateBody(userUpdateSchema), confirmUserExists, checkNewEmailNotInUse,   hashPassword, userControllers.updatePetById); 
+router.put('/:id', auth,  validateBody(userUpdateSchema), confirmUserExists, checkNewEmailNotInUse,  hashPassword, userControllers.updateUserById); 
 
 
 // Get Users API

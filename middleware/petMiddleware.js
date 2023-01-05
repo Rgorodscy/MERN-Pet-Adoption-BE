@@ -1,10 +1,18 @@
 const Ajv = require('ajv');
 const { readPetById } = require('../models/petModels');
 const ajv = new Ajv();
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer  = require('multer')
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
 
 function validateBody(schema) {
   return (req, res, next) => {
-    console.log(req.body)
     const valid = ajv.validate(schema, req.body);
     if (!valid) {
       res.status(400).send(ajv.errors[0].message);
@@ -51,4 +59,40 @@ async function checkPetNotAvailable(req, res, next) {
 }
 
 
-module.exports = { validateBody, checkPetAvailable, checkPetNotAvailable };
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
+const rebuildReqBody = (req, res, next) => {
+  if(!req.file.path){
+    const newBody = {
+      ...req.body,
+      image: '',
+      hypoallergenic: Boolean(req.body.hypoallergenic),
+      height: Number(req.body.height),
+      weight: Number(req.body.weight),
+    }
+    req.body = newBody;
+    next();
+  }
+  if(req.file.path){
+    const newBody = {
+      ...req.body,
+      image: req.file.path,
+      hypoallergenic: Boolean(req.body.hypoallergenic),
+      height: Number(req.body.height),
+      weight: Number(req.body.weight),
+    }
+    req.body = newBody;
+    next();
+  }
+}
+
+
+module.exports = { validateBody, checkPetAvailable, checkPetNotAvailable, upload, rebuildReqBody };

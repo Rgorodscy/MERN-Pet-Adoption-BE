@@ -22,6 +22,17 @@ const createPet = async (req, res) => {
 
 const findAllPets =  async (req, res) => {
     try{
+      let heightInput = req.query.height;
+      let weightInput = req.query.weight;
+      let nameInput = req.query.name;
+      for(let key in req.query){
+        heightInput ? req.query.height = { $lte: Number(heightInput)} : '';
+        weightInput ? req.query.weight = { $lte: Number(weightInput)} : '';
+        nameInput ? req.query.name = { $regex: nameInput, $options: 'i' } : '';
+        if(req.query[key] === '' || req.query[key] === 'Any'){
+          delete req.query[key]
+        }
+      }
       queryParams = req.query;
       const pets = await readAllPets(queryParams);
       res.send(pets);

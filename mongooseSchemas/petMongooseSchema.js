@@ -15,7 +15,6 @@ const petMongooseSchema = new Schema ({
       dietary: { type: 'string' },
       breed: { type: 'string' },
       id: { type: 'string' },
-      __v:  { type: 'number' },
       userId: { type: 'string' }
 
 });

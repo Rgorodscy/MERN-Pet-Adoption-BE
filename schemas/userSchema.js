@@ -39,7 +39,9 @@ const userUpdateSchema = {
         bio: { type: 'string' },
         savedPets: { type: 'array' },
         myPets:  { type: 'array' },
-        isAdmin: { type: 'string' }
+        isAdmin: { type: 'boolean' },
+        _id: { type: 'string' },
+        __v: { type: 'number' },
       },
       required: ["email", "firstName", "lastName", "phone", "password", "confirmPassword", "id"],
       additionalProperties: false,

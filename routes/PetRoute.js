@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { petSchema } = require('../schemas/petSchema');
-const { validateBody, checkPetAvailable, checkPetNotAvailable } = require('../middleware/petMiddleware'); //Think about the check if the pet exists
+const { validateBody, checkPetAvailable, checkPetNotAvailable, upload, rebuildReqBody } = require('../middleware/petMiddleware'); //Think about the check if the pet exists
 const { v4: uuidv4 } = require('uuid');
 const Pet = require('../mongooseSchemas/petMongooseSchema');
 const petControllers = require('../controllers/petControllers');
@@ -12,7 +12,7 @@ const { auth, checkAdmin } = require('../middleware/userMiddleware')
 // ADD PET API
 // Route: ‘/pet’ [POST] (Protected to admin only)
 // TODO: Handle photo upload, Admin Protection
-router.post('/', auth, checkAdmin, validateBody(petSchema), petControllers.createPet);
+router.post('/', auth, checkAdmin, upload.single('image'), rebuildReqBody ,validateBody(petSchema), petControllers.createPet);
 
 
 // GET PETS API
@@ -29,7 +29,7 @@ router.get('/:id', petControllers.findPetById);
 // Route: ‘/pet/:id’ [PUT] (protected to admin only)
 // Handle photo upload
 
-router.put('/:id', auth, checkAdmin,  validateBody(petSchema), petControllers.updatePetById); 
+router.put('/:id', auth, checkAdmin, upload.single('image'), rebuildReqBody, validateBody(petSchema), petControllers.updatePetById); 
   
 
 // Adopt/Foster API
