@@ -23,16 +23,16 @@ function validateBody(schema) {
 }
 
 async function checkPetAvailable(req, res, next) {
-  const petId = req.params.id
+  const petId = req.params.id;
   const foundPet = await readPetById(petId);
   const petAdoptStatus = foundPet[0].adoptionStatus;
   if(petAdoptStatus === "Adopted"){
     res.status(400).send("Pet already adopted");
     return;
-  }
+  };
   if(petAdoptStatus === "Available"){
     next();
-  }
+  };
   if(petAdoptStatus === "Fostered"){
     const userId = req.body.userId;
     const sameUser = foundPet[0].userId === userId;
@@ -42,12 +42,12 @@ async function checkPetAvailable(req, res, next) {
     else{
       res.status(400).send("Pet already fostered by another user");
       return;
-    }
-  }
+    };
+  };
 }
 
 async function checkPetNotAvailable(req, res, next) {
-  const petId = req.params.id
+  const petId = req.params.id;
   const foundPet = await readPetById(petId);
   const petAdoptStatus = foundPet[0].adoptionStatus;
 
@@ -80,7 +80,7 @@ const rebuildReqBody = (req, res, next) => {
     }
     req.body = newBody;
     next();
-  }
+  };
   if(req.file.path){
     const newBody = {
       ...req.body,
@@ -91,7 +91,7 @@ const rebuildReqBody = (req, res, next) => {
     }
     req.body = newBody;
     next();
-  }
+  };
 }
 
 

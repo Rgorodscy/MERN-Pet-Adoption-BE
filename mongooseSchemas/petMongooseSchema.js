@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const petMongooseSchema = new Schema ({
-
       type: { type: 'string' },
       name: { type: 'string' },
       adoptionStatus: { type: 'string' },
@@ -16,7 +15,6 @@ const petMongooseSchema = new Schema ({
       breed: { type: 'string' },
       id: { type: 'string' },
       userId: { type: 'string' }
-
 });
 
 module.exports = mongoose.model('Pet', petMongooseSchema);

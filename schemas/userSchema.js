@@ -45,7 +45,6 @@ const userUpdateSchema = {
       },
       required: ["email", "firstName", "lastName", "phone", "password", "confirmPassword", "id"],
       additionalProperties: false,
-
 };
 
 module.exports = {signupSchema, loginSchema, userUpdateSchema}

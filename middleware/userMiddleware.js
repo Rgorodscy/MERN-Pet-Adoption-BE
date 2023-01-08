@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken')
 
- function validateBody(schema) {
+function validateBody(schema) {
   return (req, res, next) => {
     const valid = ajv.validate(schema, req.body);
     if (!valid) {
@@ -14,16 +14,16 @@ const jwt = require('jsonwebtoken')
     }
     next();
   };
-}
+};
 
 async function confirmUserExists(req, res, next) {
   const userEmail = req.body.email || req.body.currentUser.email;
   const foundUser = await readUserByKey("email", userEmail);
-    if(foundUser[0]){
-        req.userExists = true
-    }
-    next();
-}
+  if(foundUser[0]){
+      req.userExists = true;
+  };
+  next();
+};
  
 async function checkNewEmailNotInUse(req, res, next) {
   const currentUserInfo = await readUserById(req.body.id);
@@ -34,30 +34,35 @@ async function checkNewEmailNotInUse(req, res, next) {
     if(userWithNewEmail.id !== currentUserInfo.id){
       req.emailInUse = true;
       res.status(400).send("New email already in use");
-      return
-    }
-  }
+      return;
+    };
+  };
   next();
 }
 
-async function checkPasswordsMatch(req, res, next) {
-      if(req.body.password !== req.body.confirmPassword){
-        res.status(400).send("Passwords don't match")
-        return
-      }
-      next();
-}
+function checkPasswordsMatch(req, res, next) {
+  if(req.body.password !== req.body.confirmPassword){
+    res.status(400).send("Passwords don't match");
+    return;
+  }
+  next();
+};
 
 async function hashPassword(req, res, next){
   if(req.method === 'PUT' && req.body.password === ''){
     next();
   };
-  const plainPassword = req.body.password;
-  const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
-  req.body.password = hashedPassword;
-  req.body.confirmPassword = hashedPassword;
-  next()
-}
+  try{
+    const plainPassword = req.body.password;
+    const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+    req.body.password = hashedPassword;
+    req.body.confirmPassword = hashedPassword;
+    next();
+  }catch(err){
+    res.status(500).send("Error hashing password");
+    console.log(err);
+  };
+};
 
 const auth = (req, res, next) => {
   if (!req.headers.authorization) {
@@ -69,13 +74,12 @@ const auth = (req, res, next) => {
     if (err) {
       res.status(401).send('Unauthorized');
       return;
-    }
-
+    };
     if (decoded) {
       req.userId = decoded.id;
       req.isAdmin = decoded.isAdmin;
       next();
-    }
+    };
   });
 };
 
@@ -85,6 +89,6 @@ const checkAdmin = async (req, res, next) => {
     return;
   };
   next();
-}
+};
 
 module.exports = { validateBody, confirmUserExists, checkNewEmailNotInUse, checkPasswordsMatch, hashPassword, auth, checkAdmin  };

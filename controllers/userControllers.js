@@ -7,8 +7,8 @@ const findAllUsers = async (req, res) => {
         res.send(users);
     }catch(err){
         console.log(err);
-        res.status(500).send(err)
-    }
+        res.status(500).send(err);
+    };
 }
 
 const findUserById = async (req, res) => {
@@ -19,13 +19,12 @@ const findUserById = async (req, res) => {
             ...foundUser[0],
             password: "",
             confirmPassword: "",
-        }
+        };
         res.status(200).send(userResponse);
-        return
     }catch(err){
         console.log(err);
-        res.status(500).send(err)
-    }
+        res.status(500).send(err);
+    };
 }
 
 const updateUserById = async (req, res) => {
@@ -33,20 +32,20 @@ const updateUserById = async (req, res) => {
         try {
             const newUserInfo = {
                 ...req.body
-            }
+            };
             if(req.body.password === '') {
                 delete newUserInfo.password;
                 delete newUserInfo.confirmPassword
-            }
+            };
             const updatedUser = await updateUser(newUserInfo);
             if (updatedUser) {
                 res.status(200).send(updatedUser);
-            }
+            };
         } catch (err) {
         res.status(500).send(err);
         console.log(err);
-        }
-    }
+        };
+    };
 }
 
 module.exports = {findAllUsers, findUserById, updateUserById}
