@@ -51,6 +51,7 @@ function checkPasswordsMatch(req, res, next) {
 async function hashPassword(req, res, next){
   if(req.method === 'PUT' && req.body.password === ''){
     next();
+    return;
   };
   try{
     const plainPassword = req.body.password;
@@ -61,6 +62,7 @@ async function hashPassword(req, res, next){
   }catch(err){
     res.status(500).send("Error hashing password");
     console.log(err);
+    return;
   };
 };
 

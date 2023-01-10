@@ -6,6 +6,7 @@ async function readAllPets(queryParams) {
     return allPets;
   }catch(err){
     console.log(err);
+    throw err;
   };
 }
 
@@ -15,6 +16,7 @@ async function readPetById(petId) {
     return pet;
   }catch(err){
     console.log(err);
+    throw err;
   };
 }
 
@@ -24,6 +26,7 @@ async function addPet(newPet) {
     return addedPet;
   } catch (err) {
     console.log(err);
+    throw err;
   };
 }
 
@@ -34,6 +37,7 @@ async function updatePet(newPetInfo) {
     return updateRes;
   } catch (err) {
     console.log(err);
+    throw err;
   };
 }
 

@@ -1,3 +1,4 @@
+const { resolveSchema } = require('ajv/dist/compile');
 const { v4: uuidv4 } = require('uuid');
 const { readAllUsers, readUserById, updateUser } = require('../models/userModels');
 
@@ -39,11 +40,12 @@ const updateUserById = async (req, res) => {
             };
             const updatedUser = await updateUser(newUserInfo);
             if (updatedUser) {
-                res.status(200).send(updatedUser);
+                res.send(updatedUser);
             };
         } catch (err) {
-        res.status(500).send(err);
-        console.log(err);
+            res.status(500).send(err);
+            console.log(err);
+            throw err;
         };
     };
 }

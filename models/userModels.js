@@ -2,14 +2,11 @@ const User = require('../mongooseSchemas/userMongooseSchema');
 
 async function readAllUsers() {
   try{
-    const allUsers = await User.find({});
-    allUsers.forEach((user) => {
-      delete user.password;
-      delete user.confirmPassword;
-    })
+    const allUsers = await User.find({}, '-password -confirmPassword',);
     return allUsers;
   }catch(err){
     console.log(err);
+    throw err;
   };
 }
 
@@ -19,6 +16,7 @@ async function readUserById(userId) {
     return user;
   }catch(err){
     console.log(err);
+    throw err;
   }; 
 }
 
@@ -28,6 +26,7 @@ async function readUserByKey(key, value) {
     return user;
   }catch(err){
     console.log(err);
+    throw err;
   }; 
 }
 
@@ -37,6 +36,7 @@ async function addUser(newUser) {
     return addedUser;
   } catch (err) {
     console.log(err);
+    throw err;
   };
 }
 
@@ -47,6 +47,7 @@ async function updateUser(newUserInfo) {
     return updateRes;
   } catch (err) {
     console.log(err);
+    throw err;
   };
 }
 
