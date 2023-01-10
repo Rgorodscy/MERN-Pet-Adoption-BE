@@ -16,7 +16,7 @@ const signupRoute = require('./routes/Signup')
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: ['http://localhost:3000','https://pet-adoption-fe.vercel.app/'], credentials: true}));
+app.use(cors({ origin: ['http://localhost:3000','https://pet-adoption-fe.vercel.app/']}));
 
 app.use('/pet', petRoute);
 app.use('/user', userRoute);
