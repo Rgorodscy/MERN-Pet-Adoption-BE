@@ -2,10 +2,11 @@
   "name": "fs-pet-adoption-be-rgorodscy",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devStart": "nodemon server.js"
+    "devStart": "nodemon index.js",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
