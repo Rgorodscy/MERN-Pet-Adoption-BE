@@ -17,12 +17,18 @@ function validateBody(schema) {
 };
 
 async function confirmUserExists(req, res, next) {
-  const userEmail = req.body.email || req.body.currentUser.email;
-  const foundUser = await readUserByKey("email", userEmail);
-  if(foundUser[0]){
-      req.userExists = true;
-  };
-  next();
+  try{
+    const userEmail = req.body.email || req.body.currentUser.email;
+    const foundUser = await readUserByKey("email", userEmail);
+    if(foundUser[0]){
+        req.userExists = true;
+    };
+    next();
+  }catch(err){
+    res.status(400).send("Please provide a valid email and password");
+    console.log(err);
+    return;
+  }
 };
  
 async function checkNewEmailNotInUse(req, res, next) {

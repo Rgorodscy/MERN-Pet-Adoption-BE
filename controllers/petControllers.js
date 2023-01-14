@@ -19,12 +19,22 @@ const createPet = async (req, res) => {
 
 const findAllPets =  async (req, res) => {
     try{
-      let heightInput = req.query.height;
-      let weightInput = req.query.weight;
+      let minHeightInput = req.query.minHeight;
+      let maxHeightInput = req.query.maxHeight;
+      let minWeightInput = req.query.minWeight;
+      let maxWeightInput = req.query.maxWeight;
       let nameInput = req.query.name;
       for(let key in req.query){
-        heightInput ? req.query.height = { $lte: Number(heightInput)} : '';
-        weightInput ? req.query.weight = { $lte: Number(weightInput)} : '';
+        minHeightInput ? req.query.height = { $gte: Number(minHeightInput)} : '';
+        maxHeightInput ? req.query.height = { $lte: Number(maxHeightInput)} : '';
+        minHeightInput && maxHeightInput ? req.query.height = { $gte: Number(minHeightInput), $lte: Number(maxHeightInput)} : '';
+        minWeightInput ? req.query.minWeight = { $gte: Number(minWeightInput)} : '';
+        maxWeightInput ? req.query.maxWeight = { $lte: Number(maxWeightInput)} : '';
+        minWeightInput && maxWeightInput ? req.query.weight = { $gte: Number(minWeightInput), $lte: Number(maxWeightInput)} : '';
+        delete req.query.minHeight;
+        delete req.query.maxHeight;
+        delete req.query.minWeight;
+        delete req.query.maxWeight;
         nameInput ? req.query.name = { $regex: nameInput, $options: 'i' } : '';
         if(req.query[key] === '' || req.query[key] === 'Any'){
           delete req.query[key]
