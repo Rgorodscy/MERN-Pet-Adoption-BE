@@ -1,6 +1,6 @@
 const Pet = require('../mongooseSchemas/petMongooseSchema');
 
-async function readAllPets(queryParams) {
+async function readSearchPets(queryParams) {
   try{
     const allPets = await Pet.find(queryParams);
     return allPets;
@@ -12,7 +12,7 @@ async function readAllPets(queryParams) {
 
 async function readPetById(petId) {
   try{
-    const pet = await Pet.find({ id: petId }).lean();
+    const pet = await Pet.findOne({ id: petId }).lean();
     return pet;
   }catch(err){
     console.log(err);
@@ -41,4 +41,4 @@ async function updatePet(newPetInfo) {
   };
 }
 
-module.exports = { readAllPets, readPetById, addPet, updatePet };
+module.exports = { readSearchPets, readPetById, addPet, updatePet };
