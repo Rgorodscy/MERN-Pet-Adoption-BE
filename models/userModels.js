@@ -12,7 +12,7 @@ async function readAllUsers() {
 
 async function readUserById(userId) {
   try{
-    const user = await User.find({ id: userId }).lean();
+    const user = await User.findOne({ id: userId }).lean();
     return user;
   }catch(err){
     console.log(err);
@@ -22,7 +22,7 @@ async function readUserById(userId) {
 
 async function readUserByKey(key, value) {
   try{
-    const user = await User.find({ [key]: value });
+    const user = await User.findOne({ [key]: value }).lean();
     return user;
   }catch(err){
     console.log(err);

@@ -17,7 +17,7 @@ const findUserById = async (req, res) => {
         const userId = req.params.id;
         const foundUser = await readUserById(userId);
         const userResponse = {
-            ...foundUser[0],
+            ...foundUser,
             password: "",
             confirmPassword: "",
         };

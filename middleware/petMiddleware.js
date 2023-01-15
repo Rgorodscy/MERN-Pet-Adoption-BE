@@ -26,7 +26,7 @@ async function checkPetAvailable(req, res, next) {
   try{
     const petId = req.params.id;
     const foundPet = await readPetById(petId);
-    const petAdoptStatus = foundPet[0].adoptionStatus;
+    const petAdoptStatus = foundPet.adoptionStatus;
     if(petAdoptStatus === "Adopted"){
       res.status(400).send("Pet already adopted");
       return;
@@ -36,7 +36,7 @@ async function checkPetAvailable(req, res, next) {
     };
     if(petAdoptStatus === "Fostered"){
       const userId = req.body.userId;
-      const sameUser = foundPet[0].userId === userId;
+      const sameUser = foundPet.userId === userId;
       if(sameUser){
         next();
       }
@@ -55,7 +55,7 @@ async function checkPetNotAvailable(req, res, next) {
   try{
     const petId = req.params.id;
     const foundPet = await readPetById(petId);
-    const petAdoptStatus = foundPet[0].adoptionStatus;
+    const petAdoptStatus = foundPet.adoptionStatus;
   
     if(petAdoptStatus === "Available"){
       res.status(400).send("Pet already available");
@@ -104,5 +104,34 @@ const rebuildReqBody = (req, res, next) => {
   };
 }
 
+const buildSearchParams = (req, res, next) => {
+  try{
+    let minHeightInput = req.query.minHeight;
+    let maxHeightInput = req.query.maxHeight;
+    let minWeightInput = req.query.minWeight;
+    let maxWeightInput = req.query.maxWeight;
+    let nameInput = req.query.name;
+    minHeightInput ? req.query.height = { $gte: Number(minHeightInput)} : '';
+    maxHeightInput ? req.query.height = { $lte: Number(maxHeightInput)} : '';
+    minHeightInput && maxHeightInput ? req.query.height = { $gte: Number(minHeightInput), $lte: Number(maxHeightInput)} : '';
+    minWeightInput ? req.query.minWeight = { $gte: Number(minWeightInput)} : '';
+    maxWeightInput ? req.query.maxWeight = { $lte: Number(maxWeightInput)} : '';
+    minWeightInput && maxWeightInput ? req.query.weight = { $gte: Number(minWeightInput), $lte: Number(maxWeightInput)} : '';
+    delete req.query.minHeight;
+    delete req.query.maxHeight;
+    delete req.query.minWeight;
+    delete req.query.maxWeight;
+    for(let key in req.query){
+      nameInput ? req.query.name = { $regex: nameInput, $options: 'i' } : '';
+      if(req.query[key] === '' || req.query[key] === 'Any'){
+        delete req.query[key]
+      }
+    };
+    next();
+  }catch(err){
+    console.log(err);
+    throw err;
+  }
+}
 
-module.exports = { validateBody, checkPetAvailable, checkPetNotAvailable, upload, rebuildReqBody };
+module.exports = { validateBody, checkPetAvailable, checkPetNotAvailable, upload, rebuildReqBody, buildSearchParams };

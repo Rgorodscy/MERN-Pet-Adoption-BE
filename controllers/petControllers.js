@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { readPetById, addPet, readAllPets, updatePet } = require('../models/petModels');
+const { readPetById, addPet, readSearchPets, updatePet } = require('../models/petModels');
 const { readUserById, updateUser } = require('../models/userModels');
 
 const createPet = async (req, res) => {
@@ -17,31 +17,10 @@ const createPet = async (req, res) => {
       };
 };
 
-const findAllPets =  async (req, res) => {
-    try{
-      let minHeightInput = req.query.minHeight;
-      let maxHeightInput = req.query.maxHeight;
-      let minWeightInput = req.query.minWeight;
-      let maxWeightInput = req.query.maxWeight;
-      let nameInput = req.query.name;
-      for(let key in req.query){
-        minHeightInput ? req.query.height = { $gte: Number(minHeightInput)} : '';
-        maxHeightInput ? req.query.height = { $lte: Number(maxHeightInput)} : '';
-        minHeightInput && maxHeightInput ? req.query.height = { $gte: Number(minHeightInput), $lte: Number(maxHeightInput)} : '';
-        minWeightInput ? req.query.minWeight = { $gte: Number(minWeightInput)} : '';
-        maxWeightInput ? req.query.maxWeight = { $lte: Number(maxWeightInput)} : '';
-        minWeightInput && maxWeightInput ? req.query.weight = { $gte: Number(minWeightInput), $lte: Number(maxWeightInput)} : '';
-        delete req.query.minHeight;
-        delete req.query.maxHeight;
-        delete req.query.minWeight;
-        delete req.query.maxWeight;
-        nameInput ? req.query.name = { $regex: nameInput, $options: 'i' } : '';
-        if(req.query[key] === '' || req.query[key] === 'Any'){
-          delete req.query[key]
-        }
-      };
+const findSearchPets =  async (req, res) => {
+  try{
       queryParams = req.query;
-      const pets = await readAllPets(queryParams);
+      const pets = await readSearchPets(queryParams);
       res.send(pets);
     }catch(err){
       console.log(err);
@@ -118,7 +97,7 @@ const savePet = async (req, res) => {
   try{
     const petId = req.params.id;
     const petInfoArray = await readPetById(petId);
-    const petInfo = petInfoArray[0];
+    const petInfo = petInfoArray;
     const newUserInfo = await addPetToUserArray(req, petInfo, "savedPets");
     const userUpdateRes = await updateUser(newUserInfo);
     res.status(200).send(petInfo);
@@ -143,7 +122,7 @@ const getUserPets = async (req, res) => {
   try{
       const userId = req.params.id;
       const userInfo = await readUserById(userId);
-      const userPets = {myPets: userInfo[0].myPets, savedPets: userInfo[0].savedPets};
+      const userPets = {myPets: userInfo.myPets, savedPets: userInfo.savedPets};
       res.status(200).send(userPets);
   }catch(err){
       res.status(400).send("User not found");
@@ -155,8 +134,7 @@ const getNewPetInfo = async(req, newPetAdoptionStatuts) => {
   try{
     const userId = req.body.userId;
     const petId = req.params.id;
-    const oldPetInfoArray = await readPetById(petId);
-    const oldPetInfo = oldPetInfoArray[0];
+    const oldPetInfo = await readPetById(petId);
     const newPetInfo = {
         ...oldPetInfo,
         adoptionStatus: newPetAdoptionStatuts,
@@ -173,9 +151,8 @@ const addPetToUserArray = async (req, petInfo, arrayToUpdate) => {
   try{
     const userId = req.body.userId;
     const petId = req.params.id;
-    const oldUserInfoArray = await readUserById(userId);
-    const oldUserInfo = oldUserInfoArray[0];
-    const filteredPetsArray = oldUserInfo.myPets.filter((pet) => pet.id !== petId);
+    const oldUserInfo = await readUserById(userId);
+    const filteredPetsArray = oldUserInfo[arrayToUpdate].filter((pet) => pet.id !== petId);
     const newUserInfo = {
       ...oldUserInfo,
       [arrayToUpdate]: [...filteredPetsArray, petInfo]
@@ -191,9 +168,8 @@ const removePetFromUserArray = async (req, arrayToUpdate) => {
   try{
     const userId = req.body.userId;
     const petId = req.params.id;
-    const oldUserInfoArray = await readUserById(userId);
-    const oldUserInfo = oldUserInfoArray[0];
-    const filteredPetsArray = oldUserInfo.myPets.filter((pet) => pet.id !== petId);
+    const oldUserInfo = await readUserById(userId);
+    const filteredPetsArray = oldUserInfo[arrayToUpdate].filter((pet) => pet.id !== petId);
     const newUserInfo = {
       ...oldUserInfo,
       [arrayToUpdate]: filteredPetsArray
@@ -205,4 +181,4 @@ const removePetFromUserArray = async (req, arrayToUpdate) => {
   }
 }
 
-module.exports = {createPet, findAllPets, findPetById, updatePetById, adoptFosterPet, returnPet, savePet, deletePet, getUserPets}
+module.exports = {createPet, findSearchPets, findPetById, updatePetById, adoptFosterPet, returnPet, savePet, deletePet, getUserPets}

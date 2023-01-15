@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const petControllers = require('../controllers/petControllers');
-const { validateBody, checkPetAvailable, checkPetNotAvailable, upload, rebuildReqBody } = require('../middleware/petMiddleware');
+const { validateBody, checkPetAvailable, checkPetNotAvailable, upload, rebuildReqBody, buildSearchParams } = require('../middleware/petMiddleware');
 const { auth, checkAdmin } = require('../middleware/userMiddleware');
 const { petSchema } = require('../schemas/petSchema');
 
 router.post('/', auth, checkAdmin, upload.single('image'), rebuildReqBody ,validateBody(petSchema), petControllers.createPet);
 
-router.get('/', petControllers.findAllPets);
+router.get('/', buildSearchParams, petControllers.findSearchPets);
 
 router.get('/:id', petControllers.findPetById);
   

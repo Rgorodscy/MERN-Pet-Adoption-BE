@@ -20,7 +20,7 @@ async function confirmUserExists(req, res, next) {
   try{
     const userEmail = req.body.email || req.body.currentUser.email;
     const foundUser = await readUserByKey("email", userEmail);
-    if(foundUser[0]){
+    if(foundUser){
         req.userExists = true;
     };
     next();
