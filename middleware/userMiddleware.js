@@ -1,9 +1,9 @@
 const Ajv = require('ajv');
 const ajv = new Ajv();
-const { readUserByKey, readUserById } = require('../models/userModels');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken')
+const User = require('../models/userModels');
 
 function validateBody(schema) {
   return (req, res, next) => {
@@ -19,7 +19,7 @@ function validateBody(schema) {
 async function confirmUserExists(req, res, next) {
   try{
     const userEmail = req.body.email || req.body.currentUser.email;
-    const foundUser = await readUserByKey("email", userEmail);
+    const foundUser = await User.readUserByKey("email", userEmail);
     if(foundUser){
         req.userExists = true;
     };
@@ -32,9 +32,9 @@ async function confirmUserExists(req, res, next) {
 };
  
 async function checkNewEmailNotInUse(req, res, next) {
-  const currentUserInfo = await readUserById(req.body.id);
+  const currentUserInfo = await User.readUserById(req.body.id);
   const newUserEmail = req.body.email;
-  const userWithNewEmail = await readUserByKey("email", newUserEmail);
+  const userWithNewEmail = await User.readUserByKey("email", newUserEmail);
   const currentUserEmail = currentUserInfo.email;
   if(newUserEmail !== currentUserEmail){
     if(userWithNewEmail.id !== currentUserInfo.id){

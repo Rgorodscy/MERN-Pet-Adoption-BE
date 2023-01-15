@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
-const { readPetById, addPet, readSearchPets, updatePet } = require('../models/petModels');
-const { readUserById, updateUser } = require('../models/userModels');
+const Pet = require('../models/petModels');
+const User = require('../models/userModels');
 
 const createPet = async (req, res) => {
     try {
@@ -9,7 +9,7 @@ const createPet = async (req, res) => {
           ...petProps,
           id: uuidv4(),
         };
-        const addedPet = await addPet(newPet);
+        const addedPet = await Pet.addPet(newPet);
         res.status(200).send(addedPet);
       } catch (err) {
         res.status(500).send(err);
@@ -20,7 +20,7 @@ const createPet = async (req, res) => {
 const findSearchPets =  async (req, res) => {
   try{
       queryParams = req.query;
-      const pets = await readSearchPets(queryParams);
+      const pets = await Pet.readSearchPets(queryParams);
       res.send(pets);
     }catch(err){
       console.log(err);
@@ -31,7 +31,7 @@ const findSearchPets =  async (req, res) => {
 const findPetById = async (req, res) => {
     try{
         const id = req.params.id;
-        const pet = await readPetById(id);
+        const pet = await Pet.readPetById(id);
         res.status(200).send(pet);
     }catch(err){
         console.log(err);
@@ -42,7 +42,7 @@ const findPetById = async (req, res) => {
 const updatePetById = async (req, res) => {
     try {
       const newPetInfo = req.body;
-      const updateRes = await updatePet(newPetInfo);
+      const updateRes = await Pet.updatePet(newPetInfo);
       res.status(200).send(newPetInfo);
     } catch (err) {
       res.status(500).send(err);
@@ -55,10 +55,10 @@ const adoptFosterPet = async (req, res) => {
   const newPetAdoptionStatuts = `${adoptType}ed`;
   try{
     const newPetInfo = await getNewPetInfo(req, newPetAdoptionStatuts)
-    const petUpdateRes = await updatePet(newPetInfo);
+    const petUpdateRes = await Pet.updatePet(newPetInfo);
     try{
       const newUserInfo = await addPetToUserArray(req, newPetInfo, "myPets");
-      const userUpdateRes = await updateUser(newUserInfo);
+      const userUpdateRes = await User.updateUser(newUserInfo);
       res.status(200).send(newPetInfo);
     }catch(err){
       res.status(400).send("Error updating user");
@@ -78,10 +78,10 @@ const returnPet = async (req, res) => {
       ...newPetInfo,
       userId: "",
     };
-    const petUpdateRes = await updatePet(returnedPetInfo);
+    const petUpdateRes = await Pet.updatePet(returnedPetInfo);
     try{
       const newUserInfo = await removePetFromUserArray(req, "myPets")
-      const userUpdateRes = await updateUser(newUserInfo);
+      const userUpdateRes = await User.updateUser(newUserInfo);
       res.status(200).send(returnedPetInfo);
     }catch(err){
       res.status(400).send("Error updating user");
@@ -96,10 +96,10 @@ const returnPet = async (req, res) => {
 const savePet = async (req, res) => {
   try{
     const petId = req.params.id;
-    const petInfoArray = await readPetById(petId);
+    const petInfoArray = await Pet.readPetById(petId);
     const petInfo = petInfoArray;
     const newUserInfo = await addPetToUserArray(req, petInfo, "savedPets");
-    const userUpdateRes = await updateUser(newUserInfo);
+    const userUpdateRes = await User.updateUser(newUserInfo);
     res.status(200).send(petInfo);
   }catch(err){
     res.status(400).send("Error updating User");
@@ -110,7 +110,7 @@ const savePet = async (req, res) => {
 const deletePet = async (req, res) => {
   try{
     const newUserInfo = await removePetFromUserArray(req, "savedPets");
-    const userUpdateRes = await updateUser(newUserInfo);
+    const userUpdateRes = await User.updateUser(newUserInfo);
     res.status(200).send(userUpdateRes);
   }catch(err){
     res.status(400).send("Error updating User");
@@ -121,7 +121,7 @@ const deletePet = async (req, res) => {
 const getUserPets = async (req, res) => {
   try{
       const userId = req.params.id;
-      const userInfo = await readUserById(userId);
+      const userInfo = await User.readUserById(userId);
       const userPets = {myPets: userInfo.myPets, savedPets: userInfo.savedPets};
       res.status(200).send(userPets);
   }catch(err){
@@ -134,7 +134,7 @@ const getNewPetInfo = async(req, newPetAdoptionStatuts) => {
   try{
     const userId = req.body.userId;
     const petId = req.params.id;
-    const oldPetInfo = await readPetById(petId);
+    const oldPetInfo = await Pet.readPetById(petId);
     const newPetInfo = {
         ...oldPetInfo,
         adoptionStatus: newPetAdoptionStatuts,
@@ -151,7 +151,7 @@ const addPetToUserArray = async (req, petInfo, arrayToUpdate) => {
   try{
     const userId = req.body.userId;
     const petId = req.params.id;
-    const oldUserInfo = await readUserById(userId);
+    const oldUserInfo = await User.readUserById(userId);
     const filteredPetsArray = oldUserInfo[arrayToUpdate].filter((pet) => pet.id !== petId);
     const newUserInfo = {
       ...oldUserInfo,
@@ -168,7 +168,7 @@ const removePetFromUserArray = async (req, arrayToUpdate) => {
   try{
     const userId = req.body.userId;
     const petId = req.params.id;
-    const oldUserInfo = await readUserById(userId);
+    const oldUserInfo = await User.readUserById(userId);
     const filteredPetsArray = oldUserInfo[arrayToUpdate].filter((pet) => pet.id !== petId);
     const newUserInfo = {
       ...oldUserInfo,

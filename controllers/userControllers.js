@@ -1,10 +1,9 @@
 const { resolveSchema } = require('ajv/dist/compile');
-const { v4: uuidv4 } = require('uuid');
-const { readAllUsers, readUserById, updateUser } = require('../models/userModels');
+const User = require('../models/userModels');
 
 const findAllUsers = async (req, res) => {
     try{
-        const users = await readAllUsers();
+        const users = await User.readAllUsers();
         res.send(users);
     }catch(err){
         console.log(err);
@@ -15,7 +14,7 @@ const findAllUsers = async (req, res) => {
 const findUserById = async (req, res) => {
     try{
         const userId = req.params.id;
-        const foundUser = await readUserById(userId);
+        const foundUser = await User.readUserById(userId);
         const userResponse = {
             ...foundUser,
             password: "",
@@ -38,7 +37,7 @@ const updateUserById = async (req, res) => {
                 delete newUserInfo.password;
                 delete newUserInfo.confirmPassword
             };
-            const updatedUser = await updateUser(newUserInfo);
+            const updatedUser = await User.updateUser(newUserInfo);
             if (updatedUser) {
                 res.send(updatedUser);
             };
