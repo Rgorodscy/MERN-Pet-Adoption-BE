@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const { validateBody, confirmUserExists, checkPasswordsMatch, hashPassword } = require('../middleware/userMiddleware');
-const { addUser } = require('../models/userModels');
 const { signupSchema } = require('../schemas/userSchema');
+const User = require('../models/userModels');
 
 router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMatch, hashPassword, async (req, res) => {
     if(!req.userExists){
@@ -21,7 +21,7 @@ router.post('/', validateBody(signupSchema), confirmUserExists, checkPasswordsMa
             password: '',
             confirmPassword: '',
           };
-          const addedUser = addUser(newUser);
+          const addedUser = User.addUser(newUser);
           if (addedUser) {
             res.status(200).send(resBody);
           }

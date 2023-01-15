@@ -3,14 +3,14 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const { validateBody, confirmUserExists } = require('../middleware/userMiddleware');
-const { readUserByKey } = require('../models/userModels');
 const { loginSchema } = require('../schemas/userSchema');
+const User = require('../models/userModels');
 
 router.post('/', validateBody(loginSchema), confirmUserExists, async (req, res) => {
     if(req.userExists){
         try {
           const userEmail = req.body.email;
-          const foundUser = await readUserByKey("email", userEmail);
+          const foundUser = await User.readUserByKey("email", userEmail);
           const hashedPassword = foundUser.password
           if(!foundUser){
             res.status(400).send("User not found");

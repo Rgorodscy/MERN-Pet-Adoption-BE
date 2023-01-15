@@ -1,9 +1,9 @@
 const Ajv = require('ajv');
-const { readPetById } = require('../models/petModels');
 const ajv = new Ajv();
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer  = require('multer')
+const Pet = require('../models/petModels');
 
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -25,7 +25,7 @@ function validateBody(schema) {
 async function checkPetAvailable(req, res, next) {
   try{
     const petId = req.params.id;
-    const foundPet = await readPetById(petId);
+    const foundPet = await Pet.readPetById(petId);
     const petAdoptStatus = foundPet.adoptionStatus;
     if(petAdoptStatus === "Adopted"){
       res.status(400).send("Pet already adopted");
@@ -54,7 +54,7 @@ async function checkPetAvailable(req, res, next) {
 async function checkPetNotAvailable(req, res, next) {
   try{
     const petId = req.params.id;
-    const foundPet = await readPetById(petId);
+    const foundPet = await Pet.readPetById(petId);
     const petAdoptStatus = foundPet.adoptionStatus;
   
     if(petAdoptStatus === "Available"){
